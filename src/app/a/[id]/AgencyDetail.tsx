@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
+import { AiBadge, AiOutput, useAi } from "@/components/AiPanel";
 import { useApp } from "@/components/AppProvider";
 import { WorkCard } from "@/components/ui";
 import { TYPES } from "@/lib/constants";
@@ -25,6 +26,7 @@ export default function AgencyDetail({ id }: { id: string }) {
   const a = agency(id);
   const [works, setWorks] = useState<Work[] | null>(null);
   const [editing, setEditing] = useState(false);
+  const ai = useAi();
 
   useEffect(() => {
     supabase.from("works").select("*").eq("agency_id", id).then(({ data, error }) => {
@@ -71,6 +73,14 @@ export default function AgencyDetail({ id }: { id: string }) {
             ? typeCounts.map(([t, n]) => <span key={t} className={`tag ty-${TYPES.indexOf(t)}`}>{t} {n}</span>)
             : <span className="muted">기록 없음</span>}
         </div>
+      </div>
+      <div className="card ai-card">
+        <div className="row"><b><AiBadge /> AI 점검 분석</b></div>
+        <p className="muted" style={{ margin: "6px 0 0" }}>이 기관의 점검·작업 이력에서 반복 이상, 주의 장비, 다음 점검 확인 항목을 정리합니다.</p>
+        <AiOutput text={ai.text} loading={ai.loading} />
+        <button className="btn ai" onClick={() => ai.run({ mode: "agency", agencyId: id })} disabled={ai.loading}>
+          {ai.loading ? "분석 중…" : ai.text ? "다시 분석" : "AI로 이력 분석"}
+        </button>
       </div>
       <h2 style={{ marginTop: 16 }}>작업 이력</h2>
       {!works ? <p className="muted">불러오는 중…</p>

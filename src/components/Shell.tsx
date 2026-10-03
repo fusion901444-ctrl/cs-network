@@ -45,8 +45,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <nav>
         <div className="in">
           <Link href="/" className={listOn ? "on" : ""}><span className="ico">📋</span>작업 목록</Link>
-          <Link href="/new" className="plus"><span>+ 작업 등록</span></Link>
           <Link href="/agencies" className={agencyOn ? "on" : ""}><span className="ico">🏛</span>기관</Link>
+          <Link href="/new" className="plus"><span>+ 작업 등록</span></Link>
+          <Link href="/ai" className={pathname === "/ai" ? "on" : ""}><span className="ico">🤖</span>AI 질문</Link>
         </div>
       </nav>
     </>

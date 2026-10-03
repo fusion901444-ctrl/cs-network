@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AiOutput, useAi } from "@/components/AiPanel";
 import { useApp } from "@/components/AppProvider";
 import { ChecklistView } from "@/components/ui";
 import { supabase } from "@/lib/supabase";
@@ -16,6 +17,7 @@ export default function Report({ id, month }: { id: string; month?: string }) {
   const a = agency(id);
   const m = month ?? todayStr().slice(0, 7);
   const [done, setDone] = useState<Work[] | null>(null);
+  const ai = useAi();
 
   useEffect(() => {
     supabase.from("works").select("*").eq("agency_id", id).eq("type", "정기점검").eq("status", "완료")
@@ -37,7 +39,10 @@ export default function Report({ id, month }: { id: string; month?: string }) {
         <Link href={`/a/${id}`} className="muted">← {a.name}</Link>
         <label className="l">점검 월</label>
         <input type="month" value={m} onChange={(e) => e.target.value && router.replace(`/report/${id}?m=${e.target.value}`)} />
-        <button className="btn" onClick={() => window.print()} disabled={!list.length}>인쇄 / PDF 저장</button>
+        <button className="btn ai" onClick={() => ai.run({ mode: "report", agencyId: id, month: m })} disabled={!list.length || ai.loading}>
+          {ai.loading ? "AI 작성 중…" : ai.text ? "AI 종합 의견 다시 작성" : "AI 종합 의견 작성"}
+        </button>
+        <button className="btn" onClick={() => window.print()} disabled={!list.length || ai.loading}>인쇄 / PDF 저장</button>
         <p className="muted">인쇄 창에서 대상을 &quot;PDF로 저장&quot;으로 선택하면 PDF 파일로 저장됩니다.</p>
       </div>
       {!done ? (
@@ -70,6 +75,20 @@ export default function Report({ id, month }: { id: string; month?: string }) {
               </p>
             </section>
           ))}
+          {(ai.text || ai.loading) && (
+            <section>
+              <h3>종합 의견</h3>
+              {ai.loading ? (
+                <AiOutput text={ai.text} loading />
+              ) : (
+                <>
+                  <textarea className="noprint ai-edit" value={ai.text} onChange={(e) => ai.setText(e.target.value)} rows={8} />
+                  <p className="muted noprint" style={{ marginTop: 4 }}>AI가 작성한 초안입니다. 확인 후 고쳐서 인쇄하세요. 저장되지 않습니다.</p>
+                  <div className="print-only pre" style={{ fontSize: 14 }}>{ai.text}</div>
+                </>
+              )}
+            </section>
+          )}
           <h3>확인</h3>
           <table className="sign">
             <tbody>

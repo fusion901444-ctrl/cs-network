@@ -26,6 +26,12 @@ SQL Editor 에서 [supabase/schema.sql](supabase/schema.sql) 전체 실행 (테�
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Publishable key (`sb_publishable_...`) |
 
+AI 기능(기관 점검 분석, 보고서 종합 의견, 기술지원 AI 질문)을 쓰려면 하나 더 추가한다. 서버에서만 쓰는 비밀 키이므로 `NEXT_PUBLIC_` 를 붙이지 않는다.
+
+| 이름 | 값 |
+|---|---|
+| `ANTHROPIC_API_KEY` | Claude API 키 (`sk-ant-...`, console.anthropic.com 에서 발급) |
+
 환경변수를 나중에 바꾸면 **Redeploy** 해야 반영된다 (`NEXT_PUBLIC_` 값은 빌드 시점에 들어간다).
 
 ## 주의
